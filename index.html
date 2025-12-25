@@ -322,21 +322,21 @@
     <div id="canvas-container"></div>
 
     <div id="ui-layer">
-        <h1>Merry Christmas</h1>
+        <h1>来自秦喆熙的圣诞祝福</h1>
 
         <div class="controls-wrapper">
             <div class="btn-group">
-                <div class="control-btn" id="cam-btn">📷 Enable Gesture</div>
+                <div class="control-btn" id="cam-btn">手势控制</div>
                 <label class="control-btn">
-                    Select Local Folder
+                    选择文件夹
                     <input type="file" id="folder-input" webkitdirectory directory multiple>
                 </label>
                 <label class="control-btn">
-                    Add Local Files
+                    选择图片
                     <input type="file" id="file-input" multiple accept="image/*">
                 </label>
             </div>
-            <div class="hint-text">Cloud Images Loaded. Add local files if needed.</div>
+            <!-- <div class="hint-text">Cloud Images Loaded. Add local files if needed.</div> -->
         </div>
         <!--
 //   - @Project: Grand Luxury Tree - Christmas Edition (Touch & Gesture)
@@ -354,19 +354,11 @@
     </div>
 
     <div id="webcam-wrapper">
-        <video 
-    id="webcam" 
-    autoplay 
-    playsinline 
-    webkit-playsinline 
-    muted
-    x5-video-player-type="h5-page"
-    x5-video-player-fullscreen="true"
-    x5-video-orientation="portrait"
-    style="object-fit: cover; width: 100%; height: 100%;"
-></video>
+        <video id="webcam" autoplay playsinline webkit-playsinline muted x5-video-player-type="h5-page"
+            x5-video-player-fullscreen="true" x5-video-orientation="portrait"
+            style="object-fit: cover; width: 100%; height: 100%;"></video>
     </div>
-    <div id="debug-info">Drag to rotate • Tap photo to view</div>
+    <!-- <div id="debug-info">Drag to rotate • Tap photo to view</div> -->
 
     <script type="module">
         import * as THREE from 'three';
@@ -899,70 +891,70 @@
         //   - 如需使用或分发，请务必保留此作者声明。
         // --> 
         async function initMediaPipe() {
-    // 微信环境检查
-    const isWechat = /MicroMessenger/i.test(navigator.userAgent);
-    
-    if (isCameraRunning) return;
-    
-    // 强制检查 HTTPS
-    if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
-        alert("微信环境下必须使用 HTTPS 链接才能开启摄像头");
-        return;
-    }
+            // 微信环境检查
+            const isWechat = /MicroMessenger/i.test(navigator.userAgent);
 
-    camBtn.innerText = "正在请求权限...";
-    
-    try {
-        // 1. 先初始化模型 (可以并行或提前)
-        const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm");
-        handLandmarker = await HandLandmarker.createFromOptions(vision, {
-            baseOptions: { 
-                modelAssetPath: `https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task`,
-                delegate: "GPU" 
-            },
-            runningMode: "VIDEO", 
-            numHands: 1
-        });
+            if (isCameraRunning) return;
 
-        // 2. 请求摄像头权限
-        // 微信端建议指定较低的分辨率以提高初始化成功率
-        const constraints = { 
-            video: { 
-                facingMode: "user",
-                width: { ideal: 480 },
-                height: { ideal: 640 },
-                frameRate: { ideal: 20 }
-            } 
-        };
+            // 强制检查 HTTPS
+            if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
+                alert("微信环境下必须使用 HTTPS 链接才能开启摄像头");
+                return;
+            }
 
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        
-        // 3. 针对微信的特殊处理：在 video 准备好后再赋值
-        video = document.getElementById('webcam');
-        video.srcObject = stream;
+            camBtn.innerText = "正在请求权限...";
 
-        // 兼容部分安卓微信：手动调用 play()
-        video.onloadedmetadata = () => {
-            video.play().then(() => {
-                predictWebcam();
-                document.getElementById('webcam-wrapper').style.opacity = 1;
-                camBtn.innerText = "手势识别已启动";
-                isCameraRunning = true;
-            }).catch(err => {
-                console.error("Video play failed:", err);
-            });
-        };
+            try {
+                // 1. 先初始化模型 (可以并行或提前)
+                const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm");
+                handLandmarker = await HandLandmarker.createFromOptions(vision, {
+                    baseOptions: {
+                        modelAssetPath: `https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task`,
+                        delegate: "GPU"
+                    },
+                    runningMode: "VIDEO",
+                    numHands: 1
+                });
 
-    } catch (e) {
-        console.error("Wechat Camera Error:", e);
-        if (e.name === 'NotAllowedError') {
-            alert("请点击微信右上角 '...' 检查设置，确保已授权摄像头权限");
-        } else {
-            alert("初始化失败: " + e.message);
+                // 2. 请求摄像头权限
+                // 微信端建议指定较低的分辨率以提高初始化成功率
+                const constraints = {
+                    video: {
+                        facingMode: "user",
+                        width: { ideal: 480 },
+                        height: { ideal: 640 },
+                        frameRate: { ideal: 20 }
+                    }
+                };
+
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+
+                // 3. 针对微信的特殊处理：在 video 准备好后再赋值
+                video = document.getElementById('webcam');
+                video.srcObject = stream;
+
+                // 兼容部分安卓微信：手动调用 play()
+                video.onloadedmetadata = () => {
+                    video.play().then(() => {
+                        predictWebcam();
+                        document.getElementById('webcam-wrapper').style.opacity = 1;
+                        camBtn.innerText = "手势识别已启动";
+                        isCameraRunning = true;
+                    }).catch(err => {
+                        console.error("Video play failed:", err);
+                    });
+                };
+
+            } catch (e) {
+                console.error("Wechat Camera Error:", e);
+                if (e.name === 'NotAllowedError') {
+                    alert("请点击微信右上角 '...' 检查设置，确保已授权摄像头权限");
+                } else {
+                    alert("初始化失败: " + e.message);
+                }
+                camBtn.innerText = "重试开启";
+            }
         }
-        camBtn.innerText = "重试开启";
-    }
-}
 
         let lastVideoTime = -1;
         async function predictWebcam() {
@@ -1080,6 +1072,3 @@
 </body>
 
 </html>
-
-
-
