@@ -982,7 +982,11 @@
                 const pinchDist = Math.hypot(lm[4].x - lm[8].x, lm[4].y - lm[8].y);
                 const extensionRatio = avgTipDist / handSize; const pinchRatio = pinchDist / handSize;
 
-                debugInfo.innerText = `Gesture Detected: ${STATE.mode}`;
+                //debugInfo.innerText = `Gesture Detected: ${STATE.mode}`;
+              // 修改这一行，增加 if 判断
+                if (debugInfo) {
+                    debugInfo.innerText = `Gesture Detected: ${STATE.mode}`;
+                }
 
                 if (extensionRatio < 1.5) { STATE.mode = 'TREE'; STATE.focusTarget = null; }
                 else if (pinchRatio < 0.35) {
@@ -1072,3 +1076,4 @@
 </body>
 
 </html>
+
